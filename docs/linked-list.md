@@ -116,4 +116,9 @@ step1 查找链表中间节点
 
 step2 反转链表
 
-step3
+step3 判断是否为回文链表
+
+```python
+Class Solution:
+
+```
