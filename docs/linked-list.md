@@ -12,7 +12,7 @@ classSolution:
 	defgetIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:  
 		p,q=headA,headB  
 		while p isnot q:
-			p=p.next if p else headB      
+			p=p.next if p else headB    
 			q=q.next if q else headA  
 		return p
 ```
@@ -119,6 +119,54 @@ step2 反转链表
 step3 判断是否为回文链表
 
 ```python
-Class Solution:
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    #876. 链表的中间节点
+    def middleNode(self,head: Optional[ListNode])->Optional[ListNode]:
+        slow=fast=head #初始化两个指针，都指向头部
+        while fast and fast.next: #当快指针开始移动
+	        slow=slow.next #慢指针每次移动一步
+	        fast=fast.next.next #快指针每次移动两步
+        return slow  #快指针到末尾时，慢指针就在中间
+    #206. 反转列表
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        pre, cur = None, head
+        while cur:
+            nxt = cur.next
+            cur.next = pre
+            pre = cur
+            cur = nxt
+        return pre
 
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        mid = self.middleNode(head)
+        head2 = self.reverseList(mid)
+        while head2:
+            if head.val != head2.val:
+                return False
+            head = head.next
+            head2 = head2.next
+        return True
+```
+
+### Hot100-[141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
+
+类似于龟兔赛跑，设置两个节点，一个一次移动一个节点，一个一次移动两个节点
+
+如果有环的话，那么某个时刻，快的节点会追上慢的节点
+
+```python
+class Solution:
+    def hasCycle(self,head:Optional[ListNode])->bool:
+        slow,fast=head,head #龟兔同时从前出发
+        while fast and fast.next:
+            slow=slow.next #乌龟先走一步
+            fast=fast.next.next #兔子走两步 
+            if fast is slow: #兔子追上乌龟，说明有环
+                return True
+        return False #访问到末尾，说明没环
 ```
