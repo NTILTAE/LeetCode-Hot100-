@@ -211,7 +211,7 @@ elif list2 is None:
 * 如果 `list2` 是空的，直接返回 `list1`
 * ▶️ 相当于："如果其中一个没东西了，就直接用另一个"
 
-#### 2. 比较节点值（核心逻辑）
+2. 比较节点值（核心逻辑）
 
 ```
 elif list1.val < list2.val:
@@ -248,3 +248,147 @@ class Solution:
 ```
 
 ### Hot100-[2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)
+
+#### 写法一：创建新节点(递归算法) 
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode],carry=0) -> Optional[ListNode]:
+        if l1 is None and l2 is None and carry==0:
+            return None
+        s=carry
+        if l1:
+            s+=l1.val  # 累加进位与节点值
+            l1=l1.next
+        if l2:
+            s+=l2.val
+            l2=l2.next
+        # s 除以 10 的余数为当前节点值，商为进位
+        return ListNode(s%10,self.addTwoNumbers(l1,l2,s//10))
+```
+
+时间复杂度O(n) 空间复杂度O(n)
+
+🧩 功能说明
+
+把两个用链表表示的数字（比如 `2→4→3` 表示数字342）相加，返回结果链表。
+
+📝 逐行解析
+
+1. 递归终止条件
+
+```python
+if l1 is None and l2 is None and carry == 0:
+    return None
+```
+
+* 当两个链表都走完**且没有进位**时停止递归
+* ▶️ 相当于："如果没数字可加且不用进位了，就结束"
+
+2. 计算当前位总和
+
+```python
+s = carry  # 初始值=进位
+if l1:
+    s += l1.val  # 加链表1当前值
+    l1 = l1.next  # 移到下一位
+if l2:
+    s += l2.val  # 加链表2当前值
+    l2 = l2.next
+```
+
+* `s` = 进位 + l1当前位 + l2当前位
+* ▶️ 相当于："当前这一位的总和 = 进位 + 两个数字的当前位"
+
+3. 生成结果节点
+
+```python
+return ListNode(s % 10, self.addTwoNumbers(l1, l2, s // 10))
+```
+
+* `s % 10`：当前位的值（取个位）
+* `s // 10`：新的进位（取十位）
+* ▶️ 相当于："当前位留个位数，十位数进位到下一轮"
+
+#### 写法二：迭代算法
+
+### Hot100-[19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+
+**想象有一把长度固定的尺子，左端点在链表头部，右端点在正数第 n 个节点。向右移动尺子，当尺子右端点到达链表末尾时，左端点就在倒数第 n 个节点。**
+
+**由于需要删除节点，我们需要找倒数第 n 个节点的前一个节点（倒数第 n+1 个节点），这样才能做删除操作。**
+
+**修改：左端点在链表头部，右端点在正数第 n+1 个节点。向右移动尺子，当尺子右端点到达链表末尾时，左端点就在倒数第 n+1 个节点。**
+
+**细节：如果 n 等于链表长度呢？没有正数第 n+1 个节点。难道要特判这种情况？**
+
+**不需要。我们可以在头节点的前面插入一个哨兵节点（dummy node），把它当作链表的头节点，这样就有正数第 n+1 个节点了。换句话说，如果遇到需要删除头节点的题目，添加哨兵节点可以简化代码逻辑，请记住这个技巧。**
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        left=right=dummy=ListNode(next=head)
+        for _ in range(n):
+            right=right.next #右指针先走n步
+        while right.next:
+            left=left.next
+            right=right.next #两指针同时移动
+        left.next=left.next.next # 左指针的下一个节点就是倒数第 n 个节点
+        return dummy.next #哨兵节点下一个就是头节点
+```
+
+🧩 代码解析
+
+1. 初始化哨兵节点
+
+```python
+left = right = dummy = ListNode(next=head)
+```
+
+* **`dummy`节点** ：作为虚拟头节点（哨兵节点），简化删除头节点的特殊情况处理
+* **`left`和 `right`指针** ：初始都指向哨兵节点
+
+2. 移动右指针
+
+```python
+for _ in range(n):
+    right = right.next  # 右指针先走n步
+```
+
+* 创建 `left`和 `right`之间的 `n`个节点间隔
+
+3. 同步移动双指针
+
+```python
+while right.next:
+    left = left.next
+    right = right.next  # 两指针同步移动
+```
+
+* 当 `right`到达链表末尾时，`left`正好停在倒数第 `n+1`个节点
+
+4. 删除目标节点
+
+```python
+left.next = left.next.next  # 跳过倒数第n个节点
+```
+
+* 修改指针引用，实现节点删除
+
+5. 返回结果
+
+```python
+return dummy.next  # 返回真正的头节点
+```
+
+* 跳过哨兵节点返回
