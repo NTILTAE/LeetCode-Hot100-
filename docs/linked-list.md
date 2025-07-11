@@ -195,3 +195,54 @@ class Solution:
                 return slow
         return None
 ```
+
+### Hot100-[21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)
+
+1. 处理空链表的情况
+
+```
+if list1 is None:
+    return list2
+elif list2 is None:
+    return list1
+```
+
+* 如果 `list1` 是空的，直接返回 `list2`（因为不需要合并了）
+* 如果 `list2` 是空的，直接返回 `list1`
+* ▶️ 相当于："如果其中一个没东西了，就直接用另一个"
+
+#### 2. 比较节点值（核心逻辑）
+
+```
+elif list1.val < list2.val:
+    list1.next = self.mergeTwoLists(list1.next, list2)
+    return list1
+else:
+    list2.next = self.mergeTwoLists(list1, list2.next)
+    return list2
+```
+
+* 比较两个链表当前节点的值：
+  * 如果 `list1` 的值更小，就把 `list1` 的 `next` 指向【`list1剩余部分`和 `整个list2`的合并结果】
+  * 否则对 `list2` 做同样操作
+* ▶️ 相当于："谁小谁当头，然后让它后面的节点继续和另一个链表PK"
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        if list1 is None:
+            return list2
+        elif list2 is None:
+            return list1
+        elif list1.val<list2.val:
+            list1.next=self.mergeTwoLists(list1.next,list2)
+            return list1
+        else:
+            list2.next=self.mergeTwoLists(list1,list2.next)
+            return list2
+```
