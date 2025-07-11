@@ -392,3 +392,36 @@ return dummy.next  # 返回真正的头节点
 ```
 
 * 跳过哨兵节点返回
+
+### Hot100-[24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+#### 解法一 迭代算法
+
+```python
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        node0 = dummy = ListNode(next=head)  # 哨兵节点
+        node1 = head                         # 第一个待交换节点
+      
+        while node1 and node1.next:          # 保证有至少两个节点可交换
+            # 记录节点指针
+            node2 = node1.next
+            node3 = node2.next
+          
+            # 执行交换
+            node0.next = node2  # 前驱节点指向node2
+            node2.next = node1  # node2指向node1
+            node1.next = node3  # node1指向下一组
+          
+            # 移动指针准备下一轮
+            node0 = node1       # 前驱节点移到交换后的后节点
+            node1 = node3       # 待交换节点移到下一组
+          
+        return dummy.next       # 返回新链表头
+```
+
+#### 解法二 递归算法
+
+```python
+
+```
