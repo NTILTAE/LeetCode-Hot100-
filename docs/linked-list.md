@@ -12,7 +12,7 @@ classSolution:
 	defgetIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:  
 		p,q=headA,headB  
 		while p isnot q:
-			p=p.next if p else headB    
+			p=p.next if p else headB  
 			q=q.next if q else headA  
 		return p
 ```
@@ -170,3 +170,7 @@ class Solution:
                 return True
         return False #访问到末尾，说明没环
 ```
+
+### Hot100-[142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)
+
+![图示解法](pic1.png)
