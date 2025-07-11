@@ -174,3 +174,24 @@ class Solution:
 ### Hot100-[142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)
 
 ![图示解法](pic1.png)
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def detectCycle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        slow = fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if fast is slow:  # 相遇点
+                while slow is not head:  # 找环的起点
+                    slow = slow.next
+                    head = head.next
+                return slow
+        return None
+```
