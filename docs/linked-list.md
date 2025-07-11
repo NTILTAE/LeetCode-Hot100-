@@ -1,3 +1,5 @@
+**递归的天然优势** ：链表结构非常适合递归处理，因为每个节点都可以看作一个子问题的起点
+
 ### Hot100-[160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
 
 具体算法如下：
@@ -428,18 +430,17 @@ class Solution:
 class Solution:
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
         # 递归终止条件：当前节点为空或只剩单个节点
-        if not head or not head.next:
-            return head
-      
-        # new_head 指向第二个节点（将成为新头节点）
-        new_head = head.next
-      
-        # 递归处理剩余部分，并将结果连接到当前第一个节点
-        head.next = self.swapPairs(new_head.next)
-      
-        # 将原来的第二个节点指向原来的第一个节点
-        new_head.next = head
-      
-        # 返回新的头节点
-        return new_head
+        if head is None or head.next is None:
+            return head  # 直接返回不足交换的单个节点或空节点
+
+        # 定义三个指针：
+        node1 = head      # 第一个待交换节点（原头节点）
+        node2 = head.next # 第二个待交换节点
+        node3 = node2.next # 下一组待交换的起始节点
+
+        # 关键递归步骤：
+        node1.next = self.swapPairs(node3)  # 将node1指向后续交换结果
+        node2.next = node1  # 将node2指向node1完成反转
+
+        return node2  # 返回新的头节点（原第二个节点）
 ```
