@@ -397,6 +397,8 @@ return dummy.next  # 返回真正的头节点
 
 #### 解法一 迭代算法
 
+先建一个哨兵节点作为0，
+
 ```python
 class Solution:
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
@@ -423,5 +425,21 @@ class Solution:
 #### 解法二 递归算法
 
 ```python
-
+class Solution:
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        # 递归终止条件：当前节点为空或只剩单个节点
+        if not head or not head.next:
+            return head
+      
+        # new_head 指向第二个节点（将成为新头节点）
+        new_head = head.next
+      
+        # 递归处理剩余部分，并将结果连接到当前第一个节点
+        head.next = self.swapPairs(new_head.next)
+      
+        # 将原来的第二个节点指向原来的第一个节点
+        new_head.next = head
+      
+        # 返回新的头节点
+        return new_head
 ```
