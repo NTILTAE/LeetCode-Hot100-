@@ -246,3 +246,5 @@ class Solution:
             list2.next=self.mergeTwoLists(list1,list2.next)
             return list2
 ```
+
+### Hot100-[2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)
