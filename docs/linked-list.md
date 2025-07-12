@@ -251,7 +251,7 @@ class Solution:
 
 ### Hot100-[2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)
 
-#### 写法一：创建新节点(递归算法) 
+#### 写法一：创建新节点(递归算法)
 
 ```python
 # Definition for singly-linked list.
@@ -406,21 +406,21 @@ class Solution:
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
         node0 = dummy = ListNode(next=head)  # 哨兵节点
         node1 = head                         # 第一个待交换节点
-      
+    
         while node1 and node1.next:          # 保证有至少两个节点可交换
             # 记录节点指针
             node2 = node1.next
             node3 = node2.next
-          
+        
             # 执行交换
             node0.next = node2  # 前驱节点指向node2
             node2.next = node1  # node2指向node1
             node1.next = node3  # node1指向下一组
-          
+        
             # 移动指针准备下一轮
             node0 = node1       # 前驱节点移到交换后的后节点
             node1 = node3       # 待交换节点移到下一组
-          
+        
         return dummy.next       # 返回新链表头
 ```
 
@@ -444,4 +444,5 @@ class Solution:
 
         return node2  # 返回新的头节点（原第二个节点）
 ```
-7.11 test
+
+### Hot-100
