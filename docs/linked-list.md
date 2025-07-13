@@ -406,21 +406,21 @@ class Solution:
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
         node0 = dummy = ListNode(next=head)  # 哨兵节点
         node1 = head                         # 第一个待交换节点
-    
+  
         while node1 and node1.next:          # 保证有至少两个节点可交换
             # 记录节点指针
             node2 = node1.next
             node3 = node2.next
-        
+      
             # 执行交换
             node0.next = node2  # 前驱节点指向node2
             node2.next = node1  # node2指向node1
             node1.next = node3  # node1指向下一组
-        
+      
             # 移动指针准备下一轮
             node0 = node1       # 前驱节点移到交换后的后节点
             node1 = node3       # 待交换节点移到下一组
-        
+      
         return dummy.next       # 返回新链表头
 ```
 
@@ -445,4 +445,65 @@ class Solution:
         return node2  # 返回新的头节点（原第二个节点）
 ```
 
-### Hot100-
+### Hot100-[92. 反转链表 II](https://leetcode.cn/problems/reverse-linked-list-ii/description/ "https://leetcode.cn/problems/reverse-linked-list-ii/description/")
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reverseBetween(self, head: Optional[ListNode], left: int, right: int) -> Optional[ListNode]:
+        p0=dummy=ListNode(next=head)
+        pre=None
+        for _ in range(left-1):
+            p0=p0.next #让P0到达反转的上一个节点
+        cur=p0.next #cur为反转的第一个节点
+        for _ in range(right-left+1):
+            nxt=cur.next
+            cur.next=pre
+            pre=cur
+            cur=nxt
+        p0.next.next=cur
+        p0.next=pre
+        return dummy.next
+```
+
+### Hot100-[25. K 个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/description/ "https://leetcode.cn/problems/reverse-nodes-in-k-group/description/")
+
+请看[【基础算法精讲 06】](https://leetcode.cn/link/?target=https%3A%2F%2Fwww.bilibili.com%2Fvideo%2FBV1sd4y1x7KN%2F)
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        #统计节点个数
+        n=0
+        cur=head
+        while cur:
+            n+=1 #得到链表的长度
+            cur=cur.next
+
+        p0=dummy=ListNode(next=head)
+        pre=None
+        cur=head
+
+        #k个一组处理
+        while n>=k: #剩余节点个数大于等于k可以循环
+            n-=k
+            for _ in range(k):
+                nxt=cur.next
+                cur.next=pre
+                pre=cur
+                cur=nxt
+            nxt=p0.next 将p0.next存起来
+            nxt.next=cur
+            p0.next=pre
+            p0=nxt
+        return dummy.next
+```
