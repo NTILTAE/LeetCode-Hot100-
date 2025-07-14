@@ -584,3 +584,48 @@ class Solution:
         return head
 
 ```
+
+**步骤 1：遍历链表，存储所有值到数组**
+
+```python
+arr = []
+cur = head
+while cur:
+    arr.append(cur.val)
+    cur = cur.next
+```
+
+* 初始化一个空数组 `arr`。
+* 用 `cur` 指针遍历链表，把每个节点的 `val` 存入 `arr`。
+* 例如，链表 `4 → 2 → 1 → 3` 会变成 `arr = [4, 2, 1, 3]`。
+
+**步骤 2：对数组排序**
+
+```python
+arr.sort()
+```
+
+* 调用 Python 内置的 `sort()` 方法（时间复杂度 `O(n log n)`）。
+* 排序后 `arr = [1, 2, 3, 4]`。
+
+**步骤 3：把排序后的值写回链表**
+
+```python
+cur = head
+for val in arr:
+    cur.val = val
+    cur = cur.next
+```
+
+* 重新用 `cur` 指针遍历链表，并按顺序把 `arr` 的值赋给每个节点。
+* 最终链表变成 `1 → 2 → 3 → 4`。
+
+**步骤 4：返回排序后的链表头**
+
+```py
+return head
+```
+
+* 由于链表是  **原地修改** （只改 `val`，不改 `next` 指针），所以直接返回 `head` 即可。
+
+### Hot100-[23. 合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
