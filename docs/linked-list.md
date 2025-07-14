@@ -411,16 +411,16 @@ class Solution:
             # 记录节点指针
             node2 = node1.next
             node3 = node2.next
-      
+    
             # 执行交换
             node0.next = node2  # 前驱节点指向node2
             node2.next = node1  # node2指向node1
             node1.next = node3  # node1指向下一组
-      
+    
             # 移动指针准备下一轮
             node0 = node1       # 前驱节点移到交换后的后节点
             node1 = node3       # 待交换节点移到下一组
-      
+    
         return dummy.next       # 返回新链表头
 ```
 
@@ -506,4 +506,81 @@ class Solution:
             p0.next=pre
             p0=nxt
         return dummy.next
+```
+
+### Hot100-[138. 随机链表的复制](https://leetcode.cn/problems/copy-list-with-random-pointer/)
+
+1. **第一步：复制节点并插入原链表**
+   * 遍历原链表，在每个节点后面插入它的复制节点。
+   * 例如：`1 → 2 → 3` 变成 `1 → 1' → 2 → 2' → 3 → 3'`。
+   * 此时，`head.next` 是新链表的头节点 `1'`。
+2. **第二步：设置新节点的 `random` 指针**
+   * 遍历链表，让新节点的 `random` 指向原 `random` 的复制节点（即 `cur.next.random = cur.random.next`）。
+   * 这样新链表的 `random` 关系就正确复制了。
+3. **第三步（这段代码）：拆分链表**
+   * **目标** ：把 `原→新→原→新→...` 的混合链表拆分成 **原链表** 和  **新链表** 。
+   * **方法** ：遍历新链表，跳过原节点，直接连接新节点。
+
+```python
+# Definition for a Node.
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = rando
+class Solution:
+    def copyRandomList(self, head: 'Optional[Node]') -> 'Optional[Node]':
+        if head is None:
+            return None
+  
+        #第一步 复制每个节点，把新节点直接插到原节点后面
+        cur=head
+        while cur:
+            cur.next=Node(cur.val,cur.next)
+            cur=cur.next.next
+
+        #第二步 遍历交错链表中的原链表节点
+        cur=head
+        while cur:
+            if cur.random:
+                # 要复制的 random 是 cur.random 的下一个节点
+                cur.next.random=cur.random.next
+            cur=cur.next.next
+  
+        #第三步 遍历交错链表中的新链表节点
+        cur=head.next
+        while cur.next:
+            # 删除原链表的节点，即当前节点的下一个节点
+            cur.next=cur.next.next
+            cur=cur.next
+        #最后返回 head.next 就相当于删除了原链表的头节点
+        return head.next
+
+
+```
+
+### Hot100-[148. 排序链表](https://leetcode.cn/problems/sort-list/)
+
+暴力手撕
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def sortList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        arr = []
+        cur = head
+        while cur:
+            arr.append(cur.val)
+            cur = cur.next
+        arr.sort()
+        cur = head
+        for val in arr:
+            cur.val = val
+            cur = cur.next
+        return head
+
 ```
