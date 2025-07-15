@@ -411,16 +411,16 @@ class Solution:
             # 记录节点指针
             node2 = node1.next
             node3 = node2.next
-    
+  
             # 执行交换
             node0.next = node2  # 前驱节点指向node2
             node2.next = node1  # node2指向node1
             node1.next = node3  # node1指向下一组
-    
+  
             # 移动指针准备下一轮
             node0 = node1       # 前驱节点移到交换后的后节点
             node1 = node3       # 待交换节点移到下一组
-    
+  
         return dummy.next       # 返回新链表头
 ```
 
