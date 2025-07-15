@@ -629,3 +629,268 @@ return head
 * 由于链表是  **原地修改** （只改 `val`，不改 `next` 指针），所以直接返回 `head` 即可。
 
 ### Hot100-[23. 合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
+
+ **堆（Heap）**是一种特殊的**完全二叉树** ，它满足以下性质：
+
+1. **堆序性质（Heap Property）** ：
+
+* **最小堆（Min-Heap）** ：每个节点的值 ≤ 其子节点的值（堆顶是最小值）。
+* **最大堆（Max-Heap）** ：每个节点的值 ≥ 其子节点的值（堆顶是最大值）。
+
+1. **完全二叉树结构** ：
+
+* 除了最后一层，其他层都是满的，且最后一层的节点尽量靠左排列。
+
+**堆的常见操作**
+
+| 操作                                    | 时间复杂度 | 说明                     |
+| --------------------------------------- | ---------- | ------------------------ |
+| **插入（`heappush`）**          | O(log⁡n)  | 插入元素并调整堆结构     |
+| **删除堆顶（`heappop`）**       | O(log⁡n)  | 取出堆顶元素并调整堆结构 |
+| **获取堆顶（查看最小值/最大值）** | O(1)       | 直接返回堆顶元素         |
+| **堆化（`heapify`）**           | O(n)       | 将普通数组转换成堆结构   |
+
+**堆的应用**
+
+1. **优先队列（Priority Queue）** ：每次取优先级最高（最小或最大）的元素。
+2. **Top K 问题** ：快速找出前 K 个最大/最小的元素。
+3. **堆排序（Heap Sort）** ：利用堆进行排序，时间复杂度 O(nlog⁡n)。
+4. **Dijkstra 算法（最短路径）** ：高效获取当前最小距离的节点。
+
+**Python 中的堆**
+
+Python 的 `heapq` 模块提供了最小堆的实现：
+
+```python
+import heap
+qheap = []
+heapq.heappush(heap, 3)  # 插入元素
+heapq.heappush(heap, 1)
+heapq.heappush(heap, 2)print(heapq.heappop(heap))  # 1（最小堆，每次弹出最小值
+```
+
+这是一个合并多个有序链表的算法，就像把好几条已经排好序的队伍合并成一条大队伍。
+
+1. 首先，我们给所有队伍的第一个同学（链表头节点）发个号码牌，让他们排成一个小队（最小堆）。
+2. 然后每次从小队里找出号码最小的同学（值最小的节点），让他加入大队伍。
+3. 这个同学走后，如果他后面还有同学（next节点不为空），就让下一位同学拿着号码牌加入小队。
+4. 重复这个过程，直到小队里没有人了，所有同学都按顺序排进了大队伍。
+
+关键点：
+
+* 用最小堆（优先队列）来快速找到当前最小的节点
+* 每次取出最小节点后，把它的下一个节点放回堆里
+* 使用哨兵节点(dummy)简化链表操作
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+ListNode.__lt__ = lambda a, b: a.val < b.val  # 让堆可以比较节点大小
+class Solution:
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        cur = dummy = ListNode()  # 哨兵节点
+        h = [head for head in lists if head]  # 过滤空链表
+        heapify(h)  # 现在可以正确堆化了
+        while h:
+            node = heappop(h)  # 弹出最小节点
+            if node.next:
+                heappush(h, node.next)  # 把下一个节点加入堆
+            cur.next = node
+            cur = cur.next
+        return dummy.next
+```
+
+### Hot100-[146. LRU 缓存](https://leetcode.cn/problems/lru-cache/)
+
+#### **什么是 LRU 缓存？**
+
+LRU（Least Recently Used，最近最少使用）是一种缓存淘汰策略，当缓存满了时，优先移除**最久未被访问**的数据。
+
+#### **LRUCache 的功能要求**
+
+1. **初始化** ：`LRUCache(int capacity)`
+
+* 设定缓存的最大容量 `capacity`。
+
+1. **查询数据** ：`int get(int key)`
+
+* 如果 `key` 存在，返回对应的 `value`，并标记为 **最近使用** 。
+* 如果 `key` 不存在，返回 `-1`。
+
+1. **插入/更新数据** ：`void put(int key, int value)`
+
+* 如果 `key` 已存在，更新 `value`，并标记为 **最近使用** 。
+* 如果 `key` 不存在，插入 `(key, value)`，并标记为 **最近使用** 。
+* 如果缓存已满（`size > capacity`），删除**最久未使用**的 `(key, value)`。
+
+1. **时间复杂度要求** ：`get` 和 `put` 操作都必须是  **O(1)** 。
+
+#### **如何实现 O(1) 的 LRU？**
+
+##### **核心数据结构**
+
+1. **双向链表（Doubly Linked List）**
+   * 用于维护数据的访问顺序， **最近访问的放在头部，最久未访问的放在尾部** 。
+   * 删除尾部节点（最久未使用）的时间是 O(1)。
+   * 移动节点到头部（标记为最近使用）的时间是 O(1)。
+2. **哈希表（Hash Map）**
+   * 存储 `key` 到链表节点的映射，实现 O(1) 的 `get` 和 `put`。
+
+##### **操作流程**
+
+1. **`get(key)`**
+   * 如果 `key` 在哈希表中：
+     * 找到对应的链表节点。
+     * 将该节点移动到链表头部（表示最近使用）。
+     * 返回 `value`。
+   * 如果 `key` 不在哈希表中：
+     * 返回 `-1`。
+2. **`put(key, value)`**
+   * 如果 `key` 已存在：
+     * 更新 `value`。
+     * 将该节点移动到链表头部。
+   * 如果 `key` 不存在：
+     * 创建新节点，插入链表头部。
+     * 存入哈希表。
+     * 如果缓存已满（`size > capacity`）：
+       * 删除链表尾部节点（最久未使用）。
+       * 从哈希表中移除对应的 `key`。
+
+```python
+import collections
+class LRUCache(collections.OrderedDict):
+    def __init__(self,capacity:int):
+        super().__init__()
+        self.capacity=capacity
+    def get(self,key:int)->int:
+        if key not in self:
+            return -1
+        self.move_to_end(key)
+        return self[key]
+    def put(self,key:int,value:int)->None:
+        if key in self:
+            self.move_to_end(key)
+        self[key]=value
+        if len(self)>self.capacity:
+            self.popitem(last=False)
+
+```
+
+```python
+import collections
+```
+
+* **导入 collections 模块** ：这个模块提供了 Python 内置的数据结构扩展，包括我们将要使用的 `OrderedDict`（有序字典）。
+
+```python
+class LRUCache(collections.OrderedDict):
+```
+
+* **定义 LRUCache 类** ：这个类继承自 `collections.OrderedDict`，意味着它将拥有有序字典的所有特性，同时我们添加了 LRU 缓存的功能。
+
+```python
+def init(self, capacity: int):
+```
+
+* **初始化方法定义** ：这是类的构造函数，接受一个整数参数 `capacity`（缓存容量）。
+
+```python
+super().init()
+```
+
+* **调用父类初始化** ：使用 `super()` 调用父类 `OrderedDict` 的构造函数，创建一个空的有序字典。
+
+```python
+  self.capacity = capacity
+```
+
+* **设置缓存容量** ：将传入的容量值保存到实例变量 `self.capacity` 中，用于后续判断缓存是否已满。
+
+```python
+ def get(self, key: int) -> int:
+```
+
+* **定义 get 方法** ：用于从缓存中获取值，接受一个整数键 `key`，返回一个整数值。
+
+```python
+   if key not in self:
+```
+
+* **检查键是否存在** ：使用 `in` 操作符检查键是否存在于缓存中。
+
+```python
+    return -1
+```
+
+* **键不存在时返回 -1** ：如果键不在缓存中，按照题目要求返回 -1。
+
+```python
+    self.move_to_end(key)
+```
+
+* **将键移到末尾** ：如果键存在，调用 `OrderedDict` 的 `move_to_end()` 方法，将该键值对移动到字典的末尾，表示它是最近使用的。
+
+```python
+ return self[key]
+```
+
+* **返回值** ：返回键对应的值。
+
+```python
+def put(self, key: int, value: int) -> None:
+```
+
+* **定义 put 方法** ：用于向缓存中添加或更新键值对，接受键 `key` 和值 `value` 两个参数。
+
+```python
+ if key in self:
+```
+
+* **检查键是否已存在** ：判断键是否已经在缓存中。
+
+```python
+    self.move_to_end(key)
+```
+
+* **移动已存在的键** ：如果键已存在，将其移动到字典末尾，表示它是最近使用的。
+
+```python
+    self[key] = value
+```
+
+* **设置键值对** ：无论键是否存在，都设置键值对。对于新键，这会将其添加到字典末尾；对于已存在的键，这会更新其值。
+
+```python
+   if len(self) > self.capacity:
+```
+
+* **检查缓存是否已满** ：比较当前缓存大小（键值对数量）与设定的容量。
+
+```python
+    self.popitem(last=False)
+```
+
+* **移除最久未使用的项** ：如果缓存已满，调用 `popitem(last=False)` 移除并返回字典中的第一个键值对（最久未使用的项）。
+
+### 关键点总结：
+
+1. **有序字典的特性** ：
+
+* `OrderedDict` 记住键的插入顺序
+* 新添加的键总是在末尾
+* `move_to_end(key)` 将指定键移到末尾
+* `popitem(last=False)` 移除并返回第一个键值对
+
+1. **LRU 策略实现** ：
+
+* **最近使用** ：通过 `move_to_end()` 将访问过的键移到末尾
+* **最久未使用** ：字典开头的键就是最久未使用的
+* **容量控制** ：当超过容量时，移除开头的键值对
+
+1. **时间复杂度** ：
+
+* 所有操作 (`get`, `put`, `move_to_end`, `popitem`) 都是 O(1) 时间复杂度
+* 完全满足题目要求的 O(1) 平均时间复杂度
