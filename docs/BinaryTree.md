@@ -91,21 +91,21 @@ class Solution:
         WHITE, GRAY = 0, 1  # 定义颜色标记：0=未访问，1=已访问
         res = []  # 存储遍历结果
         stack = [(WHITE, root)]  # 初始化栈，根节点标记为未访问
-      
+    
         while stack:  # 当栈不为空时循环
             color, node = stack.pop()  # 弹出栈顶元素
             if node is None:
                 continue  # 遇到空节点跳过
-          
+        
             if color == WHITE:  # 如果是未访问节点
             # 按【右→根→左】的逆序入栈（因为栈是LIFO后进先出）
                 stack.append((WHITE, node.right))  # 右子树（未访问）
                 stack.append((GRAY, node))         # 当前节点（标记为已访问）
                 stack.append((WHITE, node.left))   # 左子树（未访问）
-          
+        
             else:  # 如果是已访问节点（灰色）
                 res.append(node.val)  # 输出节点值
-      
+    
         return res  # 返回遍历结果
 ```
 
