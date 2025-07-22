@@ -91,21 +91,21 @@ class Solution:
         WHITE, GRAY = 0, 1  # 定义颜色标记：0=未访问，1=已访问
         res = []  # 存储遍历结果
         stack = [(WHITE, root)]  # 初始化栈，根节点标记为未访问
-    
+  
         while stack:  # 当栈不为空时循环
             color, node = stack.pop()  # 弹出栈顶元素
             if node is None:
                 continue  # 遇到空节点跳过
-        
+      
             if color == WHITE:  # 如果是未访问节点
             # 按【右→根→左】的逆序入栈（因为栈是LIFO后进先出）
                 stack.append((WHITE, node.right))  # 右子树（未访问）
                 stack.append((GRAY, node))         # 当前节点（标记为已访问）
                 stack.append((WHITE, node.left))   # 左子树（未访问）
-        
+      
             else:  # 如果是已访问节点（灰色）
                 res.append(node.val)  # 输出节点值
-    
+  
         return res  # 返回遍历结果
 ```
 
@@ -265,3 +265,140 @@ class Solution:
 二叉树的 **直径** 是指树中任意两个节点之间最长路径的 **长度** 。这条路径可能经过也可能不经过根节点 `root` 。
 
 两节点之间路径的 **长度** 由它们之间边数表示。
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        self.ans=1 #初始化最大路径节点数（至少为1，单个节点）
+
+        #定义递归函数：计算子树深度，并更新最大路径
+        def depth(root):
+            if not root:
+                return 0 #空节点深度为0
+          
+            #递归计算左右子树深度
+            l=depth(root.left) #左子树深度
+            r=depth(root.right) #右子树深度
+
+            #关键：更新最大路径节点数（当前节点作为转折点）
+
+            self.ans= max(self.ans,l+r+1) # L+R+1 是以当前节点为转折点的路径节点数
+            #返回当前子树深度（取左右子树最大深度+1）
+            return max(l,r)+1
+
+        depth(root) #从根节点开始递归
+        return self.ans-1  # 直径 = 最大路径节点数 - 1（因为边数 = 节点数 - 1）
+   
+
+```
+
+假设二叉树如下：
+
+```
+    1
+   / \
+  2   3
+ / \
+4   5
+```
+
+* **最长路径** ：节点 `4 → 2 → 1 → 3` 或 `5 → 2 → 1 → 3`（边数 = 3）。
+* **计算过程** ：
+
+1. 节点 `4`：左/右深度=0 → 路径节点数=1（`4`）。
+2. 节点 `5`：左/右深度=0 → 路径节点数=1（`5`）。
+3. 节点 `2`：左深度=1（`4`的深度），右深度=1（`5`的深度）→ 路径节点数=1+1+1=3（`4→2→5`），更新 `ans=3`。
+4. 节点 `3`：左/右深度=0 → 路径节点数=1（`3`）。
+5. 节点 `1`：左深度=2（`2`的深度），右深度=1（`3`的深度）→ 路径节点数=2+1+1=4（`4→2→1→3`），更新 `ans=4`。
+
+* **最终结果** ：直径 = `4 - 1 = 3`（边数）。
+
+### Hot100-[102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
+
+```python
+class Solution:
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if root is None:  # 如果树是空的
+            return []     # 直接返回空列表
+      
+        cur = [root]      # 当前层节点列表（初始只包含根节点）
+        ans = []          # 存储最终结果的二维列表
+      
+        while cur:        # 只要当前层还有节点就继续循环
+            vals = []     # 存储当前层所有节点的值
+            nxt = []      # 存储下一层所有节点
+          
+            # 遍历当前层的每个节点
+            for node in cur:
+                vals.append(node.val)  # 记录当前节点的值
+              
+                # 如果有左孩子，加入下一层列表
+                if node.left:
+                    nxt.append(node.left)
+              
+                # 如果有右孩子，加入下一层列表
+                if node.right:
+                    nxt.append(node.right)
+          
+            # 当前层处理完毕
+            cur = nxt      # 下一层变成新的当前层
+            ans.append(vals)  # 把当前层的值列表加入结果
+      
+        return ans  # 返回层序遍历结果
+```
+
+#### 队列
+
+1. **队列的妙用** ：
+
+* 使用 `deque`实现**先进先出（FIFO）**
+* `popleft()`高效取出最早加入的节点
+* `append()`在右侧添加新节点
+
+1. **分层处理的关键** ：
+
+```python
+   for _ in range(len(q)):  # 固定当前层的节点数量
+```
+
+   这确保每次循环只处理当前层的所有节点
+
+1. **时间复杂度 O(N)** ：每个节点进出队列各一次
+2. **空间复杂度 O(N)** ：最宽层的节点数决定队列大
+
+```python
+
+from collections import deque  # 需要导入deque（代码中省略了这行）
+
+class Solution:
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if root is None:  # 空树检查
+            return []     # 直接返回空列表
+  
+        ans = []          # 存储最终结果的二维列表
+        q = deque([root]) # 初始化队列（双端队列），放入根节点
+  
+        while q:          # 当队列不为空时循环
+            vals = []     # 存储当前层的节点值
+    
+            # 关键：处理当前层的所有节点
+            for _ in range(len(q)):  # 当前层的节点数量
+                node = q.popleft()   # 从队列左侧取出节点（先进先出）
+                vals.append(node.val) # 记录节点值
+        
+                # 将子节点加入队列（下一层）
+                if node.left:
+                    q.append(node.left)
+                if node.right:
+                    q.append(node.right)
+    
+            ans.append(vals)  # 将当前层的结果加入最终列表
+  
+        return ans  # 返回层序遍历结果
+```
